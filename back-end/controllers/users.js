@@ -1,4 +1,7 @@
+/* eslint-disable import/no-unresolved */
+const bcrypt = require('bcrypt');
 const User = require('../models/user');
+const { NotFound, Conflict } = require('../errors');
 
 const checkDataError = (res, err) => {
   if ((err.name === 'ValidationError') || (err.name === 'CastError')) {
@@ -19,24 +22,39 @@ const getUser = (req, res) => {
   User.findById(req.params._id)
     .then((user) => {
       if (!user) {
-        return res.status(404).send({ message: 'Нет пользователя с таким id' });
+        throw new NotFound('Нет пользователя с таким id');
       }
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400).send({ message: 'Нет пользователя с таким id' });
+        throw new NotFound('Нет пользователя с таким id');
       } else {
         res.status(500).send({ message: 'Ошибка на стороне сервера' });
       }
     });
 };
 
-const postUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-  User.create({ name, about, avatar })
-    .then((user) => { res.status(200).send({ user }); })
-    .catch((err) => checkDataError(res, err));
+const createUser = (req, res, next) => {
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
+
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new Conflict('Пользователь уже существует');
+      }
+      return bcrypt.hash(password, 10);
+    })
+    .then((password) =>
+      User.create({
+        name, about, avatar, email, password,
+      }))
+    .then(({ _id, email }) => {
+      res.send({ _id, email });
+    })
+    .catch(next);
 };
 
 const getMe = (req, res) => {
@@ -77,6 +95,10 @@ const updateAvatar = (req, res) => {
     .catch((err) => checkDataError(res, err));
 };
 
+const login = (req, res, next) => {
+
+}
+
 module.exports = {
-  getUsers, getUser, postUser, getMe, updateUser, updateAvatar,
+  getUsers, getUser, createUser, getMe, updateUser, updateAvatar, login
 };

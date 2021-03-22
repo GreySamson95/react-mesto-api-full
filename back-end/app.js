@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const registerValidator = require('./middlewares/validators/register');
+const { login, createUser } = require('./controllers/users');
 
 const app = express();
 
@@ -30,6 +32,8 @@ app.use((req, res, next) => {
 app.use('/', cardsRouter);
 app.use('/', usersRouter);
 app.use('/', errorRouter);
+app.post('/signin', login);
+app.post('/signup', registerValidator, createUser);
 
 app.listen(PORT, () => {
   // eslint-disable-next-line no-console
