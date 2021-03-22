@@ -1,0 +1,30 @@
+.popup__tooltip-close-button {
+  max-width: 40px;
+  max-height: 40px;
+  background: none;
+  border: none;
+  padding: 0;
+  position: absolute;
+  left: 420px;
+  top: -45px;
+  cursor: pointer;
+}
+
+@media all and (max-width: 590px) {
+  .popup__tooltip-close-button {
+    left: 340px;
+  }
+}
+
+@media all and (max-width: 425px) {
+  .popup__tooltip-close-button {
+    left: 240px;
+  }
+}
+
+@media all and (max-width: 325px) {
+  .popup__tooltip-close-button {
+    left: 40%;
+    top: -80px;
+  }
+}

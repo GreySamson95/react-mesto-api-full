@@ -1,0 +1,11 @@
+.element {
+    margin: 0;
+    padding: 0;
+    display: grid;
+    align-items: center;
+    background: white;
+    height: 361px;
+    border-radius: 10px;
+    position: relative;
+    width: 100%;
+}

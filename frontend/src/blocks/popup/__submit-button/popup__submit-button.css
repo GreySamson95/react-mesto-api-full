@@ -1,0 +1,18 @@
+.popup__submit-button {
+    height: 50.15px;
+    max-width: 358px;
+    color: white;
+    background: black;
+    border-radius: 2px;
+    opacity: 1;
+    transition: opacity .3s ease-in-out;
+    padding: 0;
+    border: none;
+    font-size: 18px;
+    line-height: 1.2;
+    margin-top: 31px;
+}
+
+.popup__submit-button:hover {
+    opacity: .8;
+}

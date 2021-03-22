@@ -1,0 +1,29 @@
+.register__input {
+  width: 350px;
+  border-bottom: 2px;
+  border-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+  border-color: #cccccc;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 14px;
+  line-height: 17px;
+  border-style: solid;
+  margin-bottom: 30px;
+  background-color: black;
+  color: white;
+}
+
+.register__input:nth-child(2) {
+  margin-bottom: 200px;
+}
+
+@media all and (max-width: 380px) {
+    .register__input {
+      width: 260px;
+    }
+    .register__input:nth-child(2) {
+        margin-bottom: 170px;
+      }
+  }

@@ -1,0 +1,53 @@
+.popup__close-button {
+    position: absolute;
+    background: url(../../../images/cross45.svg) no-repeat;
+    top: -35px;
+    right: -35px;
+    height: 35px;
+    width: 35px;
+    opacity: 1;
+    border: none;
+    transition: opacity .3s ease-in-out;
+    cursor: pointer;
+}
+
+.popup__close-button:hover {
+    opacity: .6;
+}
+
+@media screen and (max-width: 768px) {
+    .popup__close-button {
+        right: 0;
+        top: -50px;
+    }
+}
+
+.popup__close-button::before {
+  content: '';
+  /*border-left: 4px solid #ffffff;*/
+  transform: rotate(45deg);
+  left: 17px;
+  top: -3px;
+}
+
+.popup__close-button::after {
+  content: '';
+  /*border-left: 4px solid #ffffff;*/
+  transform: rotate(-45deg);
+  left: 17px;
+  top: -3px;
+}
+
+@media screen and (max-width: 768px) {
+  .popup__button-close {
+    top: -25px;
+    right: -34px;
+  }
+
+  .popup__close-button::before {
+    height: 30px
+  }
+  .popup__close-button:after {
+    height: 30px
+  }
+}

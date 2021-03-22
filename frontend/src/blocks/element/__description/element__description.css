@@ -1,0 +1,13 @@
+.element__description {
+    background: #fff;
+    height: 79px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-rows: 1fr 1fr;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0 0 10px 10px;
+    column-gap: 10px;
+    padding: 19px;
+    box-sizing: border-box;
+}
