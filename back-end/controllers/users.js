@@ -1,7 +1,10 @@
 /* eslint-disable import/no-unresolved */
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-const { NotFound, Conflict } = require('../errors');
+const { NotFound, Conflict, Unauthorized } = require('../errors');
+
+const jwt = require('jsonwebtoken');
+const { JWT_SECRET, JWT_TTL } = require('../config');
 
 const checkDataError = (res, err) => {
   if ((err.name === 'ValidationError') || (err.name === 'CastError')) {
@@ -47,10 +50,8 @@ const createUser = (req, res, next) => {
       }
       return bcrypt.hash(password, 10);
     })
-    .then((password) =>
-      User.create({
-        name, about, avatar, email, password,
-      }))
+    .then((password) => User.create({ name, about, avatar, email, password
+}))
     .then(({ _id, email }) => {
       res.send({ _id, email });
     })
@@ -96,9 +97,28 @@ const updateAvatar = (req, res) => {
 };
 
 const login = (req, res, next) => {
+  const { email, password } = req.body;
 
+  User.findOne({ email }).select('+password')
+    .then((user) => {
+      if (!user) {
+        throw new Unauthorized('Неверный email или пароль')
+      }
+      return bcrypt.compare(password, user.password)
+        .then((isValid) => {
+          if (isValid) {
+            return user;
+          }
+          throw new Unauthorized('Неверный email или пароль');
+        })
+    })
+    .then(({ _id }) => {
+      const token = jwt.sign({ _id }, JWT_SECRET, { expiresIn: JWT_TTL });
+      res.send({ token });
+    })
+    .catch(next);
 }
 
 module.exports = {
-  getUsers, getUser, createUser, getMe, updateUser, updateAvatar, login
+  getUsers, getUser, createUser, getMe, updateUser, updateAvatar, login,
 };
