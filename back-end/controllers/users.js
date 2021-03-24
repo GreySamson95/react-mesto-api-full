@@ -1,27 +1,18 @@
-/* eslint-disable import/no-unresolved */
 const bcrypt = require('bcrypt');
-const User = require('../models/user');
-const { NotFound, Conflict, Unauthorized } = require('../errors');
-
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
+const {
+  NotFound, Conflict, Unauthorized, BadRequest,
+} = require('../errors');
 const { JWT_SECRET, JWT_TTL } = require('../config');
 
-const checkDataError = (res, err) => {
-  if ((err.name === 'ValidationError') || (err.name === 'CastError')) {
-    return res.status(400).send({ message: `Переданы некоректные/ неполные данные: ${err}` });
-  }
-  return res.status(500).send({ message: `Ошибка на стороне сервера: ${err}` });
-};
-
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => { res.send(users); })
-    .catch(() => {
-      res.status(500).send({ message: 'На сервере произошла ошибка' });
-    });
+    .catch(next);
 };
 
-const getUser = (req, res) => {
+const getUser = (req, res, next) => {
   User.findById(req.params._id)
     .then((user) => {
       if (!user) {
@@ -30,11 +21,10 @@ const getUser = (req, res) => {
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new NotFound('Нет пользователя с таким id');
-      } else {
-        res.status(500).send({ message: 'Ошибка на стороне сервера' });
-      }
+      throw err;
+    })
+    .catch((err) => {
+      next(err);
     });
 };
 
@@ -50,23 +40,38 @@ const createUser = (req, res, next) => {
       }
       return bcrypt.hash(password, 10);
     })
-    .then((password) => User.create({ name, about, avatar, email, password
-}))
-    .then(({ _id, email }) => {
-      res.send({ _id, email });
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
+    .then((user) => {
+      res.send({ _id: user._id, email: user.email });
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequest('Введены некорректные данные');
+      }
+      throw err;
     })
     .catch(next);
 };
 
-const getMe = (req, res) => {
+const getMe = (req, res, next) => {
   User.findById(req.user._id)
-    .then((user) => res.send({ user }))
-    .catch(() => {
-      res.status(500).send({ message: 'Ошибка на стороне сервера' });
+    .then((user) => {
+      if (!user) {
+        throw new NotFound('Нет пользователя с таким id');
+      }
+      res.send(user);
+    })
+    .catch((err) => {
+      throw err;
+    })
+    .catch((err) => {
+      next(err);
     });
 };
 
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -77,11 +82,22 @@ const updateUser = (req, res) => {
       runValidators: true,
     },
   )
-    .then((user) => { res.send({ data: user }); })
-    .catch((err) => checkDataError(res, err));
+    .then((user) => {
+      if (!user) {
+        throw new NotFound('Нет пользователя с таким id');
+      }
+      return res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequest('Введены некорректные данные');
+      }
+      throw err;
+    })
+    .catch(next);
 };
 
-const updateAvatar = (req, res) => {
+const updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -92,8 +108,19 @@ const updateAvatar = (req, res) => {
       runValidators: true,
     },
   )
-    .then((user) => { res.send({ data: user }); })
-    .catch((err) => checkDataError(res, err));
+    .then((user) => {
+      if (!user) {
+        throw new NotFound('Нет пользователя с таким id');
+      }
+      return res.send(user);
+    })
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        throw new BadRequest('Введены некорректные данные');
+      }
+      throw err;
+    })
+    .catch(next);
 };
 
 const login = (req, res, next) => {
@@ -102,7 +129,7 @@ const login = (req, res, next) => {
   User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        throw new Unauthorized('Неверный email или пароль')
+        throw new Unauthorized('Неверный email или пароль');
       }
       return bcrypt.compare(password, user.password)
         .then((isValid) => {
@@ -110,14 +137,17 @@ const login = (req, res, next) => {
             return user;
           }
           throw new Unauthorized('Неверный email или пароль');
-        })
+        });
     })
     .then(({ _id }) => {
       const token = jwt.sign({ _id }, JWT_SECRET, { expiresIn: JWT_TTL });
       res.send({ token });
     })
+    .catch((err) => {
+      throw err;
+    })
     .catch(next);
-}
+};
 
 module.exports = {
   getUsers, getUser, createUser, getMe, updateUser, updateAvatar, login,
