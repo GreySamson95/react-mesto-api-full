@@ -11,6 +11,7 @@ const auth = (req, res, next) => {
   }
 
   const token = authorization.replace('Bearer ', '');
+  let payload;
 
   try {
     const user = jwt.verify(token, JWT_SECRET);
@@ -19,6 +20,7 @@ const auth = (req, res, next) => {
     throw new Forbidden('Необходима авторизация');
   }
 
+  req.user = payload;
   next();
 };
 
