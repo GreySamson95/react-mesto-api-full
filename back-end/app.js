@@ -3,18 +3,17 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const cors = require('cors');
-// const path = require('path');
-const registerValidator = require('./middlewares/validators/register');
-const errorHandler = require('./middlewares/errorHandler');
+const path = require('path');
+const router = require('./routes');
 const { login, createUser } = require('./controllers/users');
+const registerValidator = require('./middlewares/validators/register');
+const loginValidator = require('./middlewares/validators/login');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
+const errorHandler = require('./middlewares/errorHandler');
+const { NotFound } = require('./errors');
 
 const app = express();
-
-const PORT = 3000;
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(cors());
+const { PORT = 3000 } = process.env;
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useNewUrlParser: true,
@@ -22,19 +21,29 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-const cardsRouter = require('./routes/cards');
-const usersRouter = require('./routes/users');
-const errorRouter = require('./routes/errorUrl');
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use(express.static(path.join(__dirname, '../frontend/build')));
+app.use(requestLogger);
 
-app.use('/', cardsRouter);
-app.use('/', usersRouter);
-app.use('/', errorRouter);
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('Сервер сейчас упадёт');
+  }, 0);
+});
 
-app.post('/signin', login);
+app.post('/signin', loginValidator, login);
 app.post('/signup', registerValidator, createUser);
 
+app.use('/', router);
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
+app.use(errorLogger);
+
+app.use(() => {
+  throw new NotFound('Запрашиваемый ресурс не найден');
+});
 app.use(errorHandler);
 
 app.listen(PORT, () => {

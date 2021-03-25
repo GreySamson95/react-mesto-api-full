@@ -4,6 +4,15 @@ class Api {
       this._headers = headers
   }
 
+  getHeaders() {
+    const token = localStorage.getItem('token');
+    return {
+      ...this.headers,
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    }
+  }
+
   _getResponseData(res) {
       if (res.ok) {
           return res.json()
@@ -13,14 +22,14 @@ class Api {
 
   getCardList() {
       return fetch(`${this._url}/cards`, {
-              headers: this._headers,
+              headers: this.getHeaders()
           })
           .then(this._getResponseData)
   }
 
   getUserInfo() {
       return fetch(`${this._url}/users/me`, {
-              headers: this._headers,
+              headers: this.getHeaders()
           })
           .then(this._getResponseData)
   }
@@ -32,7 +41,7 @@ class Api {
   setUserInfo({ name, about }) {
       return fetch(`${this._url}/users/me`, {
           method: 'PATCH',
-          headers: this._headers,
+          headers: this.getHeaders(),
           body: JSON.stringify({
               name: name,
               about: about
@@ -44,7 +53,7 @@ class Api {
   setUserAvatar({ avatar }) {
       return fetch(`${this._url}/users/me/avatar`, {
           method: 'PATCH',
-          headers: this._headers,
+          headers: this.getHeaders(),
           body: JSON.stringify({
               avatar: avatar
           })
@@ -55,7 +64,7 @@ class Api {
   postPhoto({ name, link }) {
       return fetch(`${this._url}/cards`, {
           method: 'POST',
-          headers: this._headers,
+          headers: this.getHeaders(),
           body: JSON.stringify({
               name: name,
               link: link
@@ -67,7 +76,7 @@ class Api {
   deletePhoto(id) {
       return fetch(`${this._url}/cards/${id}`, {
           method: 'DELETE',
-          headers: this._headers,
+          headers: this.getHeaders(),
       })
       .then(this._getResponseData)
   }
@@ -75,18 +84,18 @@ class Api {
   changeLikeCardStatus(id, isLiked) {
       return fetch(`${this._url}/cards/likes/${id}`, {
               method: isLiked ? 'PUT' : 'DELETE',
-              headers: this._headers
+              headers: this.getHeaders()
           })
           .then(this._getResponseData)
   }
 }
 
-const api = new Api({
-  baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-18',
-  headers: {
-      authorization: '66264c4a-1a87-4c46-9ef9-8541779913f9',
-      'Content-Type': 'application/json'
-  }
-})
+// const api = new Api({
+//   baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-18',
+//   headers: {
+//       authorization: '66264c4a-1a87-4c46-9ef9-8541779913f9',
+//       'Content-Type': 'application/json'
+//   }
+// })
 
-export default api
+export default Api

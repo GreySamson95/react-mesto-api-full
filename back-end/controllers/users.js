@@ -13,12 +13,13 @@ const getUsers = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  User.findById(req.params._id)
+  const { userId } = req.params;
+  User.findOne({ _id: userId })
     .then((user) => {
       if (!user) {
         throw new NotFound('Нет пользователя с таким id');
       }
-      return res.status(200).send({ data: user });
+      return res.status(200).send({ user });
     })
     .catch((err) => {
       throw err;
@@ -56,7 +57,8 @@ const createUser = (req, res, next) => {
 };
 
 const getMe = (req, res, next) => {
-  User.findById(req.user._id)
+  const userId = req.user._id;
+  User.findById(userId)
     .then((user) => {
       if (!user) {
         throw new NotFound('Нет пользователя с таким id');
@@ -139,9 +141,9 @@ const login = (req, res, next) => {
           throw new Unauthorized('Неверный email или пароль');
         });
     })
-    .then(({ _id }) => {
-      const token = jwt.sign({ _id }, JWT_SECRET, { expiresIn: JWT_TTL });
-      res.send({ token });
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, { expiresIn: JWT_TTL });
+      res.status(200).send({ token, name: user.name, email: user.email });
     })
     .catch((err) => {
       throw err;

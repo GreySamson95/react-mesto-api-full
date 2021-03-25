@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react'
 import { Route, Switch, useHistory, Redirect, withRouter } from 'react-router-dom'
 import '../index.css'
-import api from '../utils/api.js'
+import Api from '../utils/api.js';
 import PopupWithForm from './PopupWithForm'
 import EditProfilePopup from './EditProfilePopup'
 import EditAvatarPopup from './EditAvatarPopup'
@@ -17,11 +18,11 @@ import ProtectedRoute from './ProtectedRoute.js'
 
 import * as auth from '../utils/auth.js'
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js'
-
+import defaultAvatar from '../images/Jak.jpg';
 
 function App() {
   const history = useHistory()
-  const [currentUser, setCurrentUser] = useState({})
+  const [currentUser, setCurrentUser] = useState({name: 'Жак-Ив Кусто', about: 'Исследователь', avatar: defaultAvatar });
   const [selectedCard, setSelectedCard] = useState({})
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false)
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false)
@@ -34,16 +35,29 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [email, setEmail] = useState('')
 
+  // const getToken = () => localStorage.getItem('token')
+  const token = localStorage.getItem('token')
+
+  const api = new Api({
+    baseUrl: auth.BASE_URL,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   useEffect(() => {
+   if (loggedIn) {
     api.getInitialData()
-        .then(([userData,cardData]) => {
+        .then(([userData, cardData]) => {
           setCurrentUser(userData)
             getCards(cardData)
         })
         .catch((err) => {
             console.log(err)
         })
-  }, [])
+      }
+    }, [loggedIn])
 
   function handleCardLike(card) {
     const isLiked = card.likes.some(i => i._id === currentUser._id)
@@ -128,30 +142,42 @@ function App() {
         console.log(err)
       })
   }
-
-  function handleLogin(email, password) {
-    setLoggedIn(true)
+  function handleLogin(data) {
+    const {email, password} = data;
     auth.authorization(email, password)
-    .then((res) => {
-      if (res.token){
-          localStorage.setItem('jwt', res.token)
-          return res
-      } else {
-          return
-      }
-  })
-    .then(data => {
-      if (data.token) {
-        setEmail(email)
-        history.push('/')
-      }
-    })
-    .catch(err => {
-      console.log(err)
-      setIsInfoTooltipOpen(true)
-      setStatus(false)
-    })
+      .then((res) => {
+        if (res) {
+          setLoggedIn(true);
+          localStorage.setItem('token', res.token);
+          setEmail(email);
+          history.push("/");
+        }
+      })
+      .catch((err) => {console.log(err)})
   }
+  // function handleLogin(email, password) {
+  //   setLoggedIn(true)
+  //   auth.authorization(email, password)
+  //   .then((res) => {
+  //     if (res.token){
+  //         localStorage.setItem('jwt', res.token)
+  //         return res
+  //     } else {
+  //         return
+  //     }
+  // })
+  //   .then(data => {
+  //     if (data.token) {
+  //       setEmail(email)
+  //       history.push('/')
+  //     }
+  //   })
+  //   .catch(err => {
+  //     console.log(err)
+  //     setIsInfoTooltipOpen(true)
+  //     setStatus(false)
+  //   })
+  // }
 
   function handleLogout() {
     setLoggedIn(false)
@@ -196,7 +222,6 @@ function App() {
 
   useEffect(() => {
     handleTokenCheck()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
 
