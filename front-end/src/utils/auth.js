@@ -1,4 +1,4 @@
-export const  BASE_URL  = 'http://back.greysamson.students.nomoredomains.icu'
+export const  BASE_URL  = 'https://back.greysamson.students.nomoredomains.icu'
 
 function checkResponse(response) {
   if (response.ok) {
@@ -7,18 +7,6 @@ function checkResponse(response) {
   else {
     return Promise.reject('Ошибка на сервере');
   }
-}
-
-export const register = (email, password) => {
-    return fetch(`${BASE_URL}/signup`, {
-        method: 'POST',
-        headers: {
-        'Accept': 'application/json',
-        "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password })
-    })
-    .then(checkResponse)
 }
 
 export const authorization = (email, password) => {
@@ -33,12 +21,23 @@ export const authorization = (email, password) => {
     .then(checkResponse);
 }
 
+export const register = (email, password) => {
+    return fetch(`${BASE_URL}/signup`, {
+        method: 'POST',
+        headers: {
+        'Accept': 'application/json',
+        "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, password })
+    })
+    .then(checkResponse)
+}
+
 
 export const checkToken = (token) => {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
         headers: {
-            'Accept': 'application/json',
             "Content-Type": "application/json",
             "Authorization" : `Bearer ${token}`
         }

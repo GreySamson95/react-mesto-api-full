@@ -160,7 +160,7 @@ function App() {
     setLoggedIn(false)
     setEmail(email)
     localStorage.removeItem('jwt')
-    history.push('/sign-in')
+    history.push('/signin')
   }
 
   function handleRegister(email, password) {
@@ -169,7 +169,7 @@ function App() {
         if (res) {
           setIsInfoTooltipOpen(true)
           setStatus(true)
-          history.push('/sign-in')
+          history.push('/signin')
         }
     })
     .catch((error) => {
@@ -188,7 +188,7 @@ function App() {
           if (res) {
             setLoggedIn(true)
             history.push("/")
-            setEmail(res.data.email)
+            setEmail(res.email)
           }
         })
         .catch((err) => {
@@ -200,7 +200,6 @@ function App() {
   useEffect(() => {
     handleTokenCheck()
   }, [])
-
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -215,14 +214,14 @@ function App() {
         onCardClick={handleSelectedCard}
         onCardLike={handleCardLike}
         onCardDelete={handleCardDelete} cards={cards} />
-      <Route path="/sign-in">
+      <Route path="/signin">
         <Login handleLogin={handleLogin} setEmail={setEmail}/>
       </Route>
-      <Route path="/sign-up">
+      <Route path="/signup">
         <Register handleRegister={handleRegister} />
       </Route>
       <Route>
-        {loggedIn ? <Redirect to='/' /> : <Redirect to='/sign-in' />}
+        {loggedIn ? <Redirect to='/' /> : <Redirect to='/signin' />}
       </Route>
       </Switch>
       <Footer />

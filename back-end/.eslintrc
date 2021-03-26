@@ -5,8 +5,7 @@
       "error",
       {
         "allow": [
-          "_id",
-          "__dirname"
+          "_id"
         ]
       }
     ]

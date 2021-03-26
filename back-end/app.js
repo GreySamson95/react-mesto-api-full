@@ -33,8 +33,8 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signin', loginValidator, login);
-app.post('/signup', registerValidator, createUser);
+app.post('/sign-in', loginValidator, login);
+app.post('/sign-up', registerValidator, createUser);
 
 app.use('/', router);
 app.use(express.static(path.join(__dirname, '../frontend/build')));
