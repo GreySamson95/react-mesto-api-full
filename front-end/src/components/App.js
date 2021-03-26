@@ -155,29 +155,6 @@ function App() {
       })
       .catch((err) => {console.log(err)})
   }
-  // function handleLogin(email, password) {
-  //   setLoggedIn(true)
-  //   auth.authorization(email, password)
-  //   .then((res) => {
-  //     if (res.token){
-  //         localStorage.setItem('jwt', res.token)
-  //         return res
-  //     } else {
-  //         return
-  //     }
-  // })
-  //   .then(data => {
-  //     if (data.token) {
-  //       setEmail(email)
-  //       history.push('/')
-  //     }
-  //   })
-  //   .catch(err => {
-  //     console.log(err)
-  //     setIsInfoTooltipOpen(true)
-  //     setStatus(false)
-  //   })
-  // }
 
   function handleLogout() {
     setLoggedIn(false)
