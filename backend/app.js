@@ -3,13 +3,14 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 
 const cors = require('cors');
-const path = require('path');
+// const path = require('path');
 const router = require('./routes');
 const { login, createUser } = require('./controllers/users');
 const registerValidator = require('./middlewares/validators/register');
 const loginValidator = require('./middlewares/validators/login');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const errorHandler = require('./middlewares/errorHandler');
+const auth = require('./middlewares/auth');
 const { NotFound } = require('./errors');
 
 const app = express();
@@ -20,6 +21,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useCreateIndex: true,
   useFindAndModify: false,
 });
+
 const allowedCors = [
   'https://greysamson-mesto.students.nomoredomains.icu',
   'https://www.greysamson-mesto.students.nomoredomains.icu',
@@ -35,8 +37,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   const { origin } = req.headers;
@@ -47,6 +47,10 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 app.use(requestLogger);
 
 app.get('/crash-test', () => {
@@ -57,15 +61,15 @@ app.get('/crash-test', () => {
 
 app.post('/signin', loginValidator, login);
 app.post('/signup', registerValidator, createUser);
-
+app.use(auth);
 app.use('/', router);
-app.use(express.static(path.join(__dirname, '../frontend/build')));
-
+// app.use(express.static(path.join(__dirname, '../frontend/build')));
 app.use(errorLogger);
 
 app.use(() => {
   throw new NotFound('Запрашиваемый ресурс не найден');
 });
+
 app.use(errorHandler);
 
 app.listen(PORT, () => {

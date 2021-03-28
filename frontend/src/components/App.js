@@ -39,7 +39,7 @@ function App() {
   const token = localStorage.getItem('token')
 
   const api = new Api({
-    baseUrl: auth.BASE_URL,
+    baseUrl: 'https://back.greysamson.students.nomoredomains.icu',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
