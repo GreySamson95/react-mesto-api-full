@@ -20,11 +20,33 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useCreateIndex: true,
   useFindAndModify: false,
 });
+const allowedCors = [
+  'https://greysamson-mesto.students.nomoredomains.icu',
+  'https://www.greysamson-mesto.students.nomoredomains.icu',
+  'http://greysamson-mesto.students.nomoredomains.icu',
+  'http://greysamson-mesto.students.nomoredomains.icu',
+  'http://localhost:3001',
+  'http://localhost:3000',
+];
 
-app.use(cors());
+const corsOptions = {
+  origin: allowedCors,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+app.use((req, res, next) => {
+  const { origin } = req.headers;
+
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
+  next();
+});
 app.use(requestLogger);
 
 app.get('/crash-test', () => {
@@ -33,8 +55,8 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/sign-in', loginValidator, login);
-app.post('/sign-up', registerValidator, createUser);
+app.post('/signin', loginValidator, login);
+app.post('/signup', registerValidator, createUser);
 
 app.use('/', router);
 app.use(express.static(path.join(__dirname, '../frontend/build')));
