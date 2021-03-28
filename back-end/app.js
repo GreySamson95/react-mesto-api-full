@@ -63,7 +63,7 @@ app.post('/signin', loginValidator, login);
 app.post('/signup', registerValidator, createUser);
 app.use(auth);
 app.use('/', router);
-// app.use(express.static(path.join(__dirname, '../frontend/build')));
+app.use(express.static(path.join(__dirname, '../front-end/build')));
 app.use(errorLogger);
 
 app.use(() => {
