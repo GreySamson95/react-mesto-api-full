@@ -16,9 +16,11 @@ export const authorization = (email, password) => {
             'Accept': 'application/json',
             "Content-Type": "application/json"
         },
+        credentials: 'include',
         body: JSON.stringify({ email, password })
     })
-    .then(checkResponse);
+    .then(checkResponse)
+    .catch((err) => { throw err });
 }
 
 export const register = (email, password) => {

@@ -33,10 +33,14 @@ const allowedCors = [
 
 const corsOptions = {
   origin: allowedCors,
-  optionsSuccessStatus: 200,
+  optionsSuccessStatus: 204,
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  preflightContinue: false,
+  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
+  credentials: true,
 };
 
-app.use(cors(corsOptions));
+app.use('*', cors(corsOptions));
 
 app.use((req, res, next) => {
   const { origin } = req.headers;
