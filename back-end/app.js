@@ -16,16 +16,9 @@ const { NotFound } = require('./errors');
 const app = express();
 const { PORT = 3000 } = process.env;
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-});
-
 const allowedCors = [
   'https://greysamson-mesto.students.nomoredomains.icu',
   'https://www.greysamson-mesto.students.nomoredomains.icu',
-  'http://greysamson-mesto.students.nomoredomains.icu',
   'http://greysamson-mesto.students.nomoredomains.icu',
   'http://localhost:3001',
   'http://localhost:3000',
@@ -42,14 +35,20 @@ const corsOptions = {
 
 app.use('*', cors(corsOptions));
 
-app.use((req, res, next) => {
-  const { origin } = req.headers;
+// app.use((req, res, next) => {
+//   const { origin } = req.headers;
 
-  if (allowedCors.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
+//   if (allowedCors.includes(origin)) {
+//     res.header('Access-Control-Allow-Origin', origin);
+//   }
 
-  next();
+//   next();
+// });
+
+mongoose.connect('mongodb://localhost:27017/mestodb', {
+  useNewUrlParser: true,
+  useCreateIndex: true,
+  useFindAndModify: false,
 });
 
 app.use(bodyParser.json());

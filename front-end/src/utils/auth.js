@@ -33,6 +33,7 @@ export const register = (email, password) => {
         body: JSON.stringify({ email, password })
     })
     .then(checkResponse)
+    .catch((err) => { throw err });
 }
 
 
@@ -45,4 +46,5 @@ export const checkToken = (token) => {
         }
     })
     .then(checkResponse)
+    .catch((err) => { throw err });
 }
