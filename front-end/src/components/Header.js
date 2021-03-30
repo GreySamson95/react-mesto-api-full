@@ -5,11 +5,11 @@ import logo from '../images/mesto-logo.svg'
 function Header(props) {
   const loginNavBar = (
     <nav>
-      <Route path="/signup">
-        <NavLink className="header__link" to="/signin">Войти</NavLink>
+      <Route path="/sign-up">
+        <NavLink className="header__link" to="/sign-in">Войти</NavLink>
       </Route>
-      <Route path="/signin">
-        <NavLink className="header__link" to="/signup">Регистрация</NavLink>
+      <Route path="/sign-in">
+        <NavLink className="header__link" to="/sign-up">Регистрация</NavLink>
       </Route>
       <Route exact path="/">
         <div className="header__box">

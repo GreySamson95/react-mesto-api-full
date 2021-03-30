@@ -6,6 +6,9 @@ const {
 const getCards = (req, res, next) => {
   Card.find({}).populate('owner')
     .then((cards) => {
+      if (!cards) {
+        throw new NotFound('Карточки не найдены');
+      }
       res.status(200).send(cards);
     })
     .catch(next);

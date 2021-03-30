@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react'
 import { Route, Switch, useHistory, Redirect, withRouter } from 'react-router-dom'
 import '../index.css'
-import Api from '../utils/api.js';
+import api from '../utils/api.js';
 import PopupWithForm from './PopupWithForm'
 import EditProfilePopup from './EditProfilePopup'
 import EditAvatarPopup from './EditAvatarPopup'
@@ -18,11 +17,10 @@ import ProtectedRoute from './ProtectedRoute.js'
 
 import * as auth from '../utils/auth.js'
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js'
-import defaultAvatar from '../images/Jak.jpg';
 
 function App() {
   const history = useHistory()
-  const [currentUser, setCurrentUser] = useState({name: 'Жак-Ив Кусто', about: 'Исследователь', avatar: defaultAvatar });
+  const [currentUser, setCurrentUser] = useState({});
   const [selectedCard, setSelectedCard] = useState({})
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false)
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = useState(false)
@@ -35,29 +33,7 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [email, setEmail] = useState('')
 
-  // const getToken = () => localStorage.getItem('token')
-  const token = localStorage.getItem('token')
 
-  const api = new Api({
-    baseUrl: auth.BASE_URL,
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  useEffect(() => {
-   if (loggedIn) {
-    api.getInitialData()
-        .then(([userData, cardData]) => {
-          setCurrentUser(userData)
-            getCards(cardData)
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-      }
-    }, [loggedIn])
 
   function handleCardLike(card) {
     const isLiked = card.likes.some(i => i._id === currentUser._id)
@@ -142,8 +118,7 @@ function App() {
         console.log(err)
       })
   }
-  function handleLogin(data) {
-    const {email, password} = data;
+  function handleLogin(email, password) {
     auth.authorization(email, password)
       .then((res) => {
         if (res) {
@@ -160,7 +135,7 @@ function App() {
     setLoggedIn(false)
     setEmail(email)
     localStorage.removeItem('jwt')
-    history.push('/signin')
+    history.push('/sign-in')
   }
 
   function handleRegister(email, password) {
@@ -169,13 +144,15 @@ function App() {
         if (res) {
           setIsInfoTooltipOpen(true)
           setStatus(true)
-          history.push('/signin')
+          history.push('/sign-in')
         }
     })
     .catch((error) => {
-      console.log(error)
       setIsInfoTooltipOpen(true)
       setStatus(false)
+      if (error === 400)
+          return console.log('Ошибка: некорректно заполнено одно из полей');
+      console.log(error);
     })
 
   }
@@ -187,8 +164,8 @@ function App() {
         .then((res) => {
           if (res) {
             setLoggedIn(true)
-            history.push("/")
             setEmail(res.email)
+            history.push("/")
           }
         })
         .catch((err) => {
@@ -198,8 +175,26 @@ function App() {
   }
 
   useEffect(() => {
-    handleTokenCheck()
-  }, [])
+    if (loggedIn) {
+      Promise.all([
+        api.getUserInfo(),
+        api.getCardList()
+      ])
+         .then(([userData, cardData]) => {
+            setCurrentUser(userData)
+            getCards(cardData)
+         })
+         .catch((err) => {
+             console.log(err)
+         })
+   }
+   }, [loggedIn])
+
+  useEffect(() => {
+    handleTokenCheck();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
@@ -214,14 +209,14 @@ function App() {
         onCardClick={handleSelectedCard}
         onCardLike={handleCardLike}
         onCardDelete={handleCardDelete} cards={cards} />
-      <Route path="/signin">
+      <Route path="/sign-in">
         <Login handleLogin={handleLogin} setEmail={setEmail}/>
       </Route>
-      <Route path="/signup">
+      <Route path="/sign-up">
         <Register handleRegister={handleRegister} />
       </Route>
       <Route>
-        {loggedIn ? <Redirect to='/' /> : <Redirect to='/signin' />}
+        {loggedIn ? <Redirect to='/' /> : <Redirect to='/sign-in' />}
       </Route>
       </Switch>
       <Footer />

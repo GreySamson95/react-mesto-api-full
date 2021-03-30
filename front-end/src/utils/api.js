@@ -1,3 +1,5 @@
+import { configHeaders } from './utils';
+
 class Api {
   constructor({ baseUrl, headers }) {
       this._url = baseUrl
@@ -32,10 +34,6 @@ class Api {
               headers: this.getHeaders()
           })
           .then(this._getResponseData)
-  }
-
-  getInitialData() {
-      return Promise.all([this.getUserInfo(), this.getCardList()])
   }
 
   setUserInfo({ name, about }) {
@@ -90,12 +88,6 @@ class Api {
   }
 }
 
-// const api = new Api({
-//   baseUrl: 'https://mesto.nomoreparties.co/v1/cohort-18',
-//   headers: {
-//       authorization: '66264c4a-1a87-4c46-9ef9-8541779913f9',
-//       'Content-Type': 'application/json'
-//   }
-// })
+const api = new Api(configHeaders);
 
-export default Api
+export default api

@@ -1,12 +1,24 @@
-export const  BASE_URL  = 'https://back.greysamson.students.nomoredomains.icu'
+import { BASE_URL } from './utils';
 
 function checkResponse(response) {
   if (response.ok) {
     return response.json();
   }
   else {
-    return Promise.reject('Ошибка на сервере');
+    return Promise.reject(response.status);
   }
+}
+
+export const register = (email, password) => {
+  return fetch(`${BASE_URL}/signup`, {
+      method: 'POST',
+      headers: {
+      'Accept': 'application/json',
+      "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email, password })
+  })
+  .then((res) => checkResponse(res))
 }
 
 export const authorization = (email, password) => {
@@ -16,35 +28,19 @@ export const authorization = (email, password) => {
             'Accept': 'application/json',
             "Content-Type": "application/json"
         },
-        credentials: 'include',
         body: JSON.stringify({ email, password })
     })
-    .then(checkResponse)
-    .catch((err) => { throw err });
+    .then(checkResponse);
 }
-
-export const register = (email, password) => {
-    return fetch(`${BASE_URL}/signup`, {
-        method: 'POST',
-        headers: {
-        'Accept': 'application/json',
-        "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password })
-    })
-    .then(checkResponse)
-    .catch((err) => { throw err });
-}
-
 
 export const checkToken = (token) => {
     return fetch(`${BASE_URL}/users/me`, {
         method: 'GET',
         headers: {
+            'Accept': 'application/json',
             "Content-Type": "application/json",
-            "Authorization" : `Bearer ${token}`
-        }
+            Authorization : `Bearer ${token}`
+        },
     })
-    .then(checkResponse)
-    .catch((err) => { throw err });
+    .then((res) => checkResponse(res))
 }

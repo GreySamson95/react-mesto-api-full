@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const isEmail = require('validator/lib/isEmail');
 
 const regex = /https?:\/\/[www]?[a-z0-9/.-]+#?/;
 
@@ -27,7 +28,12 @@ const userSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 30,
     required: true,
-    unique: true,
+    validate: {
+      validator(v) {
+        return isEmail(v);
+      },
+      message: 'Некорректный email',
+    },
   },
   password: {
     type: String,

@@ -26,7 +26,7 @@ function Register(props) {
            </form>
            <div className="register__signin">
             <p>Уже зарегистрированы?</p>
-            <Link to="signin" className="register__login-link">Войти</Link>
+            <Link to="sign-in" className="register__login-link">Войти</Link>
            </div>
          </div>
         </>
