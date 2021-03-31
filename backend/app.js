@@ -21,13 +21,25 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
+const allowedCors = [
+  'https://greysamson-mesto.students.nomoredomains.icu',
+  'https://greysamson-mesto.students.nomoredomains.icu',
+  'http://greysamson-mesto.students.nomoredomains.icu',
+  'http://localhost:3001',
+  'http://localhost:3000',
+];
+const corsOptions = {
+  origin: allowedCors,
+  optionsSuccessStatus: 200,
+};
 
-app.use(cors());
+app.use(cors(corsOptions));
+// app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-const { PORT = 3001 } = process.env;
+const { PORT = 3000 } = process.env;
 
 app.use(requestLogger);
 
@@ -46,6 +58,16 @@ app.use(errorLogger);
 
 // app.use(errorHandler);
 app.use(errors());
+
+app.use((req, res, next) => {
+  const { origin } = req.headers;
+
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
+  next();
+});
 
 app.use('*', (req, res, next) => {
   next(new NotFound('Запрашиваемый ресурс не найден'));
