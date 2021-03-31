@@ -27,10 +27,15 @@ const allowedCors = [
   'http://greysamson-mesto.students.nomoredomains.icu',
   'http://localhost:3001',
   'http://localhost:3000',
+  'http://localhost:8080',
 ];
 const corsOptions = {
   origin: allowedCors,
-  optionsSuccessStatus: 200,
+  optionsSuccessStatus: 204,
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+  preflightContinue: false,
+  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
@@ -58,16 +63,6 @@ app.use(errorLogger);
 
 // app.use(errorHandler);
 app.use(errors());
-
-app.use((req, res, next) => {
-  const { origin } = req.headers;
-
-  if (allowedCors.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin);
-  }
-
-  next();
-});
 
 app.use('*', (req, res, next) => {
   next(new NotFound('Запрашиваемый ресурс не найден'));
