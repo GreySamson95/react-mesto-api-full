@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const cors = require('cors');
+// const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -21,24 +21,24 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
   useUnifiedTopology: true,
 });
-const allowedCors = [
-  'https://greysamson-mesto.students.nomoredomains.icu',
-  'https://greysamson-mesto.students.nomoredomains.icu',
-  'http://greysamson-mesto.students.nomoredomains.icu',
-  'http://localhost:3001',
-  'http://localhost:3000',
-  'http://localhost:8080',
-];
-const corsOptions = {
-  origin: allowedCors,
-  optionsSuccessStatus: 204,
-  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  preflightContinue: false,
-  allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
-  credentials: true,
-};
+// const allowedCors = [
+//   'https://greysamson-mesto.students.nomoredomains.icu',
+//   'https://greysamson-mesto.students.nomoredomains.icu',
+//   'http://greysamson-mesto.students.nomoredomains.icu',
+//   'http://localhost:3001',
+//   'http://localhost:3000',
+//   'http://localhost:8080',
+// ];
+// const corsOptions = {
+//   origin: allowedCors,
+//   optionsSuccessStatus: 204,
+//   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
+//   preflightContinue: false,
+//   allowedHeaders: ['Content-Type', 'origin', 'Authorization'],
+//   credentials: true,
+// };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 // app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
