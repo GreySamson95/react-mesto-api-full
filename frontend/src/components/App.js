@@ -33,10 +33,42 @@ function App() {
   const [loggedIn, setLoggedIn] = useState(false)
   const [email, setEmail] = useState('')
 
+  useEffect(() => {
+    const jwt = localStorage.getItem('jwt')
+    if (jwt) {
+      auth.checkToken(jwt)
+        .then((res) => {
+          if (res) {
+            setLoggedIn(true)
+            setEmail(res.email)
+            history.push("/")
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
+    }
+    // eslint-disable-next-line
+  }, [])
 
+  useEffect(() => {
+    if (loggedIn) {
+      Promise.all([
+        api.getUserInfo(),
+        api.getCardList()
+      ])
+         .then(([userData, cardData]) => {
+            setCurrentUser(userData)
+            getCards(cardData)
+         })
+         .catch((err) => {
+             console.log(err)
+         })
+   }
+   }, [loggedIn])
 
   function handleCardLike(card) {
-    const isLiked = card.likes.some(i => i._id === currentUser._id)
+    const isLiked = card.likes.some((i) => i === currentUser._id)
     api.changeLikeCardStatus(card._id, !isLiked)
       .then((newCard) => {
         const newCards = cards.map((c) => c._id === card._id ? newCard : c)
@@ -156,45 +188,6 @@ function App() {
     })
 
   }
-
-  function handleTokenCheck() {
-    const jwt = localStorage.getItem('jwt')
-    if (jwt) {
-      auth.checkToken(jwt)
-        .then((res) => {
-          if (res) {
-            setLoggedIn(true)
-            setEmail(res.email)
-            history.push("/")
-          }
-        })
-        .catch((err) => {
-          console.log(err)
-        })
-    }
-  }
-
-  useEffect(() => {
-    if (loggedIn) {
-      Promise.all([
-        api.getUserInfo(),
-        api.getCardList()
-      ])
-         .then(([userData, cardData]) => {
-            setCurrentUser(userData)
-            getCards(cardData)
-         })
-         .catch((err) => {
-             console.log(err)
-         })
-   }
-   }, [loggedIn])
-
-  useEffect(() => {
-    handleTokenCheck();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
 
   return (
     <CurrentUserContext.Provider value={currentUser}>

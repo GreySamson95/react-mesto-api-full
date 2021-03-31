@@ -20,7 +20,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "npm run build && scp -r ./build/* greysamson@178.154.198.195:/home/greysamson/react-mesto-api-full/front-end"
+    "deploy": "npm run build && scp -r ./build/* greysamson@178.154.198.195:/home/greysamson/react-mesto-api-full/frontend"
   },
   "eslintConfig": {
     "extends": [

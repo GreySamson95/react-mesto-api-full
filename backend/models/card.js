@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { ObjectId } = require('mongodb');
 
 const regex = /https?:\/\/[www.]?[a-z0-9.-]{1,}\.[a-z]{2,3}[a-z0-9/.-=]?#?/;
 
@@ -20,12 +21,12 @@ const cardSchema = new mongoose.Schema({
     },
   },
   owner: {
-    type: mongoose.ObjectId,
+    type: ObjectId,
     required: true,
     ref: 'user',
   },
   likes: {
-    type: Array,
+    type: [ObjectId],
     default: [],
     required: true,
   },

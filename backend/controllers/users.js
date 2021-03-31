@@ -17,12 +17,13 @@ const getUsers = (req, res, next) => {
 };
 
 const getUser = (req, res, next) => {
-  User.findOne(req.params._id)
-    .then((user) => {
-      if (!user) {
+  const { userId } = req.params;
+  User.findOne({ _id: userId })
+    .then((u) => {
+      if (!u) {
         throw new NotFound('Нет пользователя с таким id');
       }
-      return res.status(200).send({ user });
+      return res.status(200).send(u);
     })
     .catch((err) => {
       throw err;
@@ -60,7 +61,8 @@ const createUser = (req, res, next) => {
 };
 
 const getMe = (req, res, next) => {
-  User.findById(req.params._id)
+  const userId = req.user._id;
+  User.findById(userId)
     .then((user) => {
       if (!user) {
         throw new NotFound('Нет пользователя с таким id');
