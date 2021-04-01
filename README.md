@@ -4,4 +4,4 @@
 Ссылка на сайт, размещенный на Яндекс.Облаке.
 ### Бекэнд: https://back.greysamson.students.nomoredomains.icu
 ### Фронтэнд: https://greysamson-mesto.students.nomoredomains.icu
-### IP: 178.154.198.195
+### IP: 130.193.40.130
