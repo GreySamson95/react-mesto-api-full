@@ -11,8 +11,7 @@ const { login, createUser } = require('./controllers/users');
 const registerValidator = require('./middlewares/validators/register');
 const loginValidator = require('./middlewares/validators/login');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-// const errorHandler = require('./middlewares/errorHandler');
-const { NotFound } = require('./errors');
+const NotFound = require('./errors/NotFound');
 
 const app = express();
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -38,7 +37,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// app.use(cors());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
@@ -58,9 +56,10 @@ app.post('/signin', loginValidator, login);
 app.post('/signup', registerValidator, createUser);
 app.use('/', router);
 
+app.use('/users', router);
+
 app.use(errorLogger);
 
-// app.use(errorHandler);
 app.use(errors());
 
 app.use('*', (req, res, next) => {
@@ -68,15 +67,18 @@ app.use('*', (req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
   next();
+  if (err.statusCode === undefined) {
+    const { statusCode = 500, message } = err;
+    return res
+      .status(statusCode)
+      .send({
+        message: statusCode === 500
+          ? 'На сервере произошла ошибка'
+          : message,
+      });
+  }
+  return res.status(err.statusCode).send({ message: err.message });
 });
 
 app.listen(PORT);

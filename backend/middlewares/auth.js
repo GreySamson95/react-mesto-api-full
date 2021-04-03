@@ -1,11 +1,11 @@
 const { NODE_ENV, JWT_SECRET } = process.env;
 const jwt = require('jsonwebtoken');
-const { Forbidden } = require('../errors');
+const Forbidden = require('../errors/Forbidden');
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
-  if (!authorization) {
+  if (!authorization || !authorization.startsWith('Bearer ')) {
     throw new Forbidden('Необходима авторизация');
   }
 

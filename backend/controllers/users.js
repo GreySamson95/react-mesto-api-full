@@ -2,9 +2,10 @@ const { NODE_ENV, JWT_SECRET } = process.env;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const {
-  NotFound, Conflict, Unauthorized, BadRequest,
-} = require('../errors');
+const NotFound = require('../errors/NotFound');
+const Conflict = require('../errors/Conflict');
+const Unauthorized = require('../errors/Unauthorized');
+const BadRequest = require('../errors/BadRequest');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -19,15 +20,14 @@ const getUsers = (req, res, next) => {
 const getUser = (req, res, next) => {
   const { userId } = req.params;
   User.findOne({ _id: userId })
+
     .then((u) => {
       if (!u) {
         throw new NotFound('Нет пользователя с таким id');
       }
-      return res.status(200).send(u);
+      return res.send(u);
     })
-    .catch((err) => {
-      throw err;
-    })
+
     .catch((err) => {
       next(err);
     });
@@ -67,7 +67,7 @@ const getMe = (req, res, next) => {
       if (!user) {
         throw new NotFound('Нет пользователя с таким id');
       }
-      res.status(200).send(user);
+      res.send(user);
     })
     .catch((err) => {
       throw err;
@@ -148,9 +148,6 @@ const login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, NODE_ENV === 'production' ? JWT_SECRET : 'secret', { expiresIn: '7d' });
       res.status(200).send({ token, name: user.name, email: user.email });
-    })
-    .catch((err) => {
-      throw err;
     })
     .catch(next);
 };

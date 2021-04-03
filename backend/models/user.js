@@ -1,24 +1,23 @@
 const mongoose = require('mongoose');
-const isEmail = require('validator/lib/isEmail');
 
 const regex = /https?:\/\/[www]?[a-z0-9/.-]+#?/;
 
 const userSchema = new mongoose.Schema({
   name: {
     type: String,
-    default: 'Жак-Ив Кусто',
+    default: 'Какой то USER',
     minlength: 2,
     maxlength: 30,
   },
   about: {
     type: String,
-    default: 'Исследователь',
+    default: 'Исследователь моего сайта',
     minlength: 2,
     maxlength: 30,
   },
   avatar: {
     type: String,
-    default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    default: 'https://w7.pngwing.com/pngs/109/994/png-transparent-teacher-student-college-school-education-avatars.png',
     validate: {
       validator(v) {
         return regex.test(v);
@@ -31,12 +30,6 @@ const userSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 30,
     required: true,
-    validate: {
-      validator(v) {
-        return isEmail(v);
-      },
-      message: 'Некорректный email',
-    },
   },
   password: {
     type: String,

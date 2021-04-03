@@ -24,16 +24,20 @@ class Api {
 
   getCardList() {
       return fetch(`${this._url}/cards`, {
-              headers: this.getHeaders()
-          })
-          .then(this._getResponseData)
+        headers: this.getHeaders(),
+      })
+        .then(this._getResponseData)
   }
 
   getUserInfo() {
       return fetch(`${this._url}/users/me`, {
-              headers: this.getHeaders()
-          })
-          .then(this._getResponseData)
+        headers: this.getHeaders(),
+      })
+        .then(this._getResponseData)
+  }
+
+  getAllNeededData() {
+    return Promise.all([this.getUserInfo(), this.getCardList()]);
   }
 
   setUserInfo({ name, about }) {

@@ -34,9 +34,9 @@ function App() {
   const [email, setEmail] = useState('')
 
   useEffect(() => {
-    const jwt = localStorage.getItem('jwt')
-    if (jwt) {
-      auth.checkToken(jwt)
+    const token = localStorage.getItem('jwt')
+    if (token) {
+      auth.checkToken(token)
         .then((res) => {
           if (res) {
             setLoggedIn(true)
@@ -51,12 +51,11 @@ function App() {
     // eslint-disable-next-line
   }, [])
 
+
   useEffect(() => {
     if (loggedIn) {
-      Promise.all([
-        api.getUserInfo(),
-        api.getCardList()
-      ])
+    api
+    .getAllNeededData()
          .then(([userData, cardData]) => {
             setCurrentUser(userData)
             getCards(cardData)
@@ -154,10 +153,10 @@ function App() {
     auth.authorization(email, password)
       .then((res) => {
         if (res) {
-          setLoggedIn(true);
           localStorage.setItem('token', res.token);
-          setEmail(email);
-          history.push("/");
+          setEmail(email)
+          ;setLoggedIn(true);
+          history.push("./");
         }
       })
       .catch((err) => {console.log(err)})
@@ -186,7 +185,6 @@ function App() {
           return console.log('Ошибка: некорректно заполнено одно из полей');
       console.log(error);
     })
-
   }
 
   return (
